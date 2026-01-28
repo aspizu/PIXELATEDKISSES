@@ -8,5 +8,5 @@ export default defineConfig({
     plugins: [react(), tailwindcss()],
     resolve: {alias: {"@": path.resolve(__dirname, "./src")}},
     build: {target: "esnext", sourcemap: true, emptyOutDir: true},
-    base: "/pixelatedkisses/",
+    base: "/PIXELATEDKISSES/",
 })
