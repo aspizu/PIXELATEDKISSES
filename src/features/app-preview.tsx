@@ -72,18 +72,12 @@ export function AppPreview() {
         setWebGLState(initWebGL(canvasRef.current))
         const scale = computeScale(canvasRef.current)
         setScale(scale)
-        canvasRef.current.style.scale = `${scale}`
-        if (!imgRef.current) return
-        imgRef.current.style.scale = `${scale}`
     }, [image, setWebGLState])
     const size = useWindowSize()
     useEffect(() => {
         if (!canvasRef.current) return
         const scale = computeScale(canvasRef.current)
         setScale(scale)
-        canvasRef.current.style.scale = `${scale}`
-        if (!imgRef.current) return
-        imgRef.current.style.scale = `${scale}`
     }, [size])
     return (
         <div className="bg-muted relative h-full w-full">
@@ -96,13 +90,14 @@ export function AppPreview() {
                 <img
                     ref={imgRef}
                     src={dataURL}
-                    width={image?.width}
-                    height={image?.height}
                     className={cn(
                         "absolute top-[50%] left-[50%] z-2 translate-x-[-50%] translate-y-[-50%]",
                         !isOriginalVisible && "hidden",
                     )}
-                    style={{scale: `${scale}`}}
+                    style={{
+                        width: `${(image?.width ?? 0) * scale}px`,
+                        height: `${(image?.height ?? 0) * scale}px`,
+                    }}
                 />
             )}
             {image && (
