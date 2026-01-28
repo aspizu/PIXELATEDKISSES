@@ -36,6 +36,6 @@ export async function imageToImageData(
             canvas.width = (image.width * opts.maxHeight) / image.height
         }
     }
-    ctx.drawImage(image, 0, 0)
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
     return ctx.getImageData(0, 0, canvas.width, canvas.height)
 }

@@ -80,6 +80,11 @@ export function AppPreview() {
                 ref={canvasRef}
                 className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
             />
+            {image && (
+                <span className="text-muted-foreground absolute right-1 bottom-1 rounded text-xs font-medium">
+                    {image.width} × {image.height}
+                </span>
+            )}
         </div>
     )
 }
