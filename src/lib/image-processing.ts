@@ -39,3 +39,15 @@ export async function imageToImageData(
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
     return ctx.getImageData(0, 0, canvas.width, canvas.height)
 }
+
+export function imageDataToDataURL(imageData: ImageData): string {
+    const canvas = document.createElement("canvas")
+    const ctx = canvas.getContext("2d")
+    if (!ctx) {
+        throw new Error("Unable to get 2D context from canvas.")
+    }
+    canvas.width = imageData.width
+    canvas.height = imageData.height
+    ctx.putImageData(imageData, 0, 0)
+    return canvas.toDataURL("image/png")
+}

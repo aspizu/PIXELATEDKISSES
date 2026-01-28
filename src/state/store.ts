@@ -17,6 +17,7 @@ export interface WebGLState {
 
 export interface AppState {
     image?: ImageData
+    dataURL?: string
     exported?: string
     threshold1: number
     threshold2: number
@@ -26,6 +27,7 @@ export interface AppState {
     grain: number
     contrast: number
     brightness: number
+    isOriginalVisible: boolean
     gl?: WebGLState
 }
 
@@ -41,6 +43,8 @@ export interface AppActions {
     setContrast: (value: number) => void
     setBrightness: (value: number) => void
     setWebGLState: (glVars: WebGLState) => void
+    setDataURL: (dataURL: string) => void
+    setIsOriginalVisible: (visible: boolean) => void
 }
 
 export const useAppStore = create<AppState & AppActions>()((set) => ({
@@ -52,6 +56,8 @@ export const useAppStore = create<AppState & AppActions>()((set) => ({
     grain: 0.0,
     contrast: 0.0,
     brightness: 0.0,
+    isOriginalVisible: false,
+    setIsOriginalVisible: (visible) => set({isOriginalVisible: visible}),
     setImage: (image) => set({image}),
     setExported: (exported) => set({exported}),
     setThreshold1: (threshold1) => set({threshold1}),
@@ -63,4 +69,5 @@ export const useAppStore = create<AppState & AppActions>()((set) => ({
     setContrast: (contrast) => set({contrast}),
     setBrightness: (brightness) => set({brightness}),
     setWebGLState: (gl) => set({gl}),
+    setDataURL: (dataURL: string) => set({dataURL}),
 }))

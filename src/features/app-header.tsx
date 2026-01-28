@@ -1,14 +1,32 @@
 import {Button} from "@/components/ui/button"
-import {imageToImageData, loadImageFromFile} from "@/lib/image-processing"
+import {
+    imageDataToDataURL,
+    imageToImageData,
+    loadImageFromFile,
+} from "@/lib/image-processing"
 import {useAppStore} from "@/state/store"
+import {useLongPress} from "@uidotdev/usehooks"
 import {saveAs} from "file-saver"
 import {Plus, SquareArrowOutUpRight, SquareSplitHorizontal} from "lucide-react"
 import {showOpenFilePicker} from "show-open-file-picker"
 
 export function AppHeader() {
     const setImage = useAppStore((store) => store.setImage)
+    const setDataURL = useAppStore((store) => store.setDataURL)
+    const setIsOriginalVisible = useAppStore((store) => store.setIsOriginalVisible)
     const exported = useAppStore((store) => store.exported)
-
+    const attrs = useLongPress(() => {}, {
+        onStart: () => {
+            setIsOriginalVisible(true)
+        },
+        onCancel: () => {
+            setIsOriginalVisible(false)
+        },
+        onFinish: () => {
+            setIsOriginalVisible(false)
+        },
+        threshold: Infinity,
+    })
     async function onOpenPress() {
         let fileHandle: FileSystemFileHandle
         try {
@@ -16,9 +34,7 @@ export function AppHeader() {
                 types: [
                     {
                         description: "Images",
-                        accept: {
-                            "image/*": [".png", ".jpg", ".jpeg", ".bmp", ".gif"],
-                        },
+                        accept: {"image/*": [".png", ".jpg", ".jpeg", ".bmp", ".gif"]},
                     },
                 ],
                 multiple: false,
@@ -30,7 +46,9 @@ export function AppHeader() {
         const file = await fileHandle.getFile()
         const image = await loadImageFromFile(file)
         const imageData = await imageToImageData(image, {maxWidth: 768})
+        const dataURL = imageDataToDataURL(imageData)
         setImage(imageData)
+        setDataURL(dataURL)
     }
 
     function onExportPress() {
@@ -54,7 +72,7 @@ export function AppHeader() {
                 <SquareArrowOutUpRight />
             </Button>
             <div className="grow" />
-            <Button size="icon-sm" variant="ghost">
+            <Button size="icon-sm" variant="ghost" {...attrs}>
                 <SquareSplitHorizontal />
             </Button>
         </div>

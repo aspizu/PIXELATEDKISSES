@@ -1,21 +1,21 @@
+import {cn} from "@/lib/utils"
 import {initWebGL, renderImage, setTexture, setUniforms} from "@/lib/webgl"
 import {useAppStore} from "@/state/store"
 import {useWindowSize} from "@uidotdev/usehooks"
-import {useCallback, useEffect, useRef} from "react"
+import {useCallback, useEffect, useRef, useState} from "react"
 
-function scalePreview(canvas: HTMLCanvasElement) {
+function computeScale(canvas: HTMLCanvasElement): number {
     const parent = canvas.parentElement
-    if (!parent) return
-    if (canvas.width < canvas.height) {
-        const scale = parent.clientHeight / canvas.height
-        canvas.style.scale = `${scale}`
-    } else {
-        const scale = parent.clientWidth / canvas.width
-        canvas.style.scale = `${scale}`
-    }
+    if (!parent) return 1
+
+    const scaleX = parent.clientWidth / canvas.width
+    const scaleY = parent.clientHeight / canvas.height
+
+    return Math.min(scaleX, scaleY)
 }
 
 export function AppPreview() {
+    const [scale, setScale] = useState(0)
     const image = useAppStore((store) => store.image)
     const gl = useAppStore((store) => store.gl)
     const threshold1 = useAppStore((store) => store.threshold1)
@@ -26,9 +26,12 @@ export function AppPreview() {
     const grain = useAppStore((store) => store.grain)
     const contrast = useAppStore((store) => store.contrast)
     const brightness = useAppStore((store) => store.brightness)
+    const isOriginalVisible = useAppStore((store) => store.isOriginalVisible)
+    const dataURL = useAppStore((store) => store.dataURL)
     const setWebGLState = useAppStore((store) => store.setWebGLState)
     const setExported = useAppStore((store) => store.setExported)
     const canvasRef = useRef<HTMLCanvasElement>(null)
+    const imgRef = useRef<HTMLImageElement>(null)
     const render = useCallback(() => {
         if (!gl) return
         if (!canvasRef.current) return
@@ -67,21 +70,43 @@ export function AppPreview() {
         canvasRef.current.width = image.width
         canvasRef.current.height = image.height
         setWebGLState(initWebGL(canvasRef.current))
-        scalePreview(canvasRef.current)
+        const scale = computeScale(canvasRef.current)
+        setScale(scale)
+        canvasRef.current.style.scale = `${scale}`
+        if (!imgRef.current) return
+        imgRef.current.style.scale = `${scale}`
     }, [image, setWebGLState])
     const size = useWindowSize()
     useEffect(() => {
         if (!canvasRef.current) return
-        scalePreview(canvasRef.current)
+        const scale = computeScale(canvasRef.current)
+        setScale(scale)
+        canvasRef.current.style.scale = `${scale}`
+        if (!imgRef.current) return
+        imgRef.current.style.scale = `${scale}`
     }, [size])
     return (
-        <div className="bg-muted relative h-full">
+        <div className="bg-muted relative h-full w-full">
             <canvas
                 ref={canvasRef}
-                className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
+                className="absolute top-[50%] left-[50%] z-1 translate-x-[-50%] translate-y-[-50%]"
+                style={{scale: `${scale}`}}
             />
+            {dataURL && (
+                <img
+                    ref={imgRef}
+                    src={dataURL}
+                    width={image?.width}
+                    height={image?.height}
+                    className={cn(
+                        "absolute top-[50%] left-[50%] z-2 translate-x-[-50%] translate-y-[-50%]",
+                        !isOriginalVisible && "hidden",
+                    )}
+                    style={{scale: `${scale}`}}
+                />
+            )}
             {image && (
-                <span className="text-muted-foreground absolute right-1 bottom-1 rounded text-xs font-medium">
+                <span className="text-muted-foreground absolute right-1 bottom-1 z-2 rounded text-xs font-medium">
                     {image.width} × {image.height}
                 </span>
             )}
