@@ -52,7 +52,7 @@ export const useAppStore = create<AppState & AppActions>()((set) => ({
     threshold2: 0.75,
     color1: [0.0, 0.0, 0.0],
     color2: [0.5, 0.5, 0.5],
-    color3: [1.0, 0.5, 0.5],
+    color3: [1.0, 0.4, 0.4],
     grain: 0.0,
     contrast: 0.0,
     brightness: 0.0,
